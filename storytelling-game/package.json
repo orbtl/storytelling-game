@@ -9,10 +9,15 @@
     "build": "vite build"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/material": "^6.4.6",
     "cross-env": "^7.0.3",
     "express": "^4.21.2",
+    "konva": "^9.3.18",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-konva": "^19.0.3",
     "tsx": "^4.3.0",
     "typescript": "^5.3.2",
     "vite-express": "*"
