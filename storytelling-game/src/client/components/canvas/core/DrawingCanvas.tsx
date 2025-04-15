@@ -2,10 +2,10 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import { Stage, Layer, Line, Rect } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
+import { socketUri } from '../../../config/socket/socketConfig';
 
 const WIDTH = 900;
 const HEIGHT = 600;
-const WEBSOCKETURI = 'ws://localhost:8080';
 
 export interface LineType {
   tool: string;
@@ -16,7 +16,7 @@ export default function DrawingCanvas() {
   const [tool, setTool] = useState<string>('pen');
   const [lines, setLines] = useState<LineType[]>([]);
   const isDrawing = useRef<boolean>(false);
-  const { sendMessage, lastMessage, readyState } = useWebSocket(WEBSOCKETURI);
+  const { sendMessage, lastMessage, readyState } = useWebSocket(socketUri);
 
   const handleSetLines = useCallback((newLines: LineType[]) => {
     setLines(newLines);
