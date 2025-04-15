@@ -1,9 +1,11 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { Stage, Layer, Line, Rect } from 'react-konva';
 import { KonvaEventObject } from 'konva/lib/Node';
+import useWebSocket, { ReadyState } from 'react-use-websocket';
 
 const WIDTH = 900;
 const HEIGHT = 600;
+const WEBSOCKETURI = 'ws://localhost:8080';
 
 export interface LineType {
   tool: string;
@@ -14,17 +16,24 @@ export default function DrawingCanvas() {
   const [tool, setTool] = useState<string>('pen');
   const [lines, setLines] = useState<LineType[]>([]);
   const isDrawing = useRef<boolean>(false);
+  const { sendMessage, lastMessage, readyState } = useWebSocket(WEBSOCKETURI);
+
+  const handleSetLines = useCallback((newLines: LineType[]) => {
+    setLines(newLines);
+    if (readyState === ReadyState.OPEN) {
+      sendMessage(JSON.stringify(newLines));
+    }
+  }, [sendMessage, readyState]);
 
   const handleMouseDown = useCallback((e: KonvaEventObject<MouseEvent>) => {
     isDrawing.current = true;
     const pos = e.target.getStage()?.getPointerPosition();
     if (pos) {
-      setLines([...lines, { tool, points: [pos.x, pos.y] }]);
+      handleSetLines([...lines, { tool, points: [pos.x, pos.y] }]);
     }
-  }, [lines, tool]);
+  }, [lines, tool, handleSetLines]);
 
   const handleMouseMove = useCallback((e: KonvaEventObject<MouseEvent>) => {
-    console.log(e);
     if (!isDrawing.current) {
       return;
     }
@@ -35,9 +44,9 @@ export default function DrawingCanvas() {
 
       // Replace last line history with updated line
       lines.splice(lines.length - 1, 1, lastLine);
-      setLines(lines.concat());
+      handleSetLines(lines.concat());
     }
-  }, [lines]);
+  }, [lines, handleSetLines]);
 
   const handleMouseUp = useCallback(() => {
     isDrawing.current = false;
@@ -46,6 +55,14 @@ export default function DrawingCanvas() {
   useEffect(() => {
     document.body.style.cursor = tool === 'pen' ? 'crosshair' : 'default';
   }, [tool]);
+
+  useEffect(() => {
+    console.log('lastMessage', lastMessage);
+    if (lastMessage !== null) {
+      const newLines = JSON.parse(lastMessage.data) as LineType[];
+      setLines(newLines);
+    }
+  }, [lastMessage]);
 
   return (
     <Stage
