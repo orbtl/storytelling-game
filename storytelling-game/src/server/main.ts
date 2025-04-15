@@ -1,5 +1,8 @@
 import express from "express";
 import ViteExpress from "vite-express";
+import makeSocketServer from "./sockets/socketServer.js";
+
+makeSocketServer();
 
 const app = express();
 
