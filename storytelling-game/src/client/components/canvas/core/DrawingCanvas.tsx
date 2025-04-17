@@ -64,6 +64,14 @@ export default function DrawingCanvas() {
     }
   }, [lastMessage]);
 
+  useEffect(() => {
+    for (const readyStateKey in ReadyState) {
+      if (ReadyState[readyStateKey] === readyState) {
+        console.log('readyState', readyStateKey);
+      }
+    }
+  }, [readyState]);
+
   return (
     <Stage
       width={WIDTH}
